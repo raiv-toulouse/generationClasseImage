@@ -1,10 +1,10 @@
 # GenerationClasseImage
 Génération d'imagettes pour DeepLearning
 
-##But
+## But
 A partir d'une vidéo ou d'un répertoire d'images, sélectionnez des ROI que vous affecterez à une classe et qui seront ensuite transformés en imagettes.
 Ces imagettes serviront ensuite à l'entrainement d'un réseau de neurones de type DeepLearning.
-##Mode d'emploi
+## Mode d'emploi
 Deux applications sont disponibles : 
 * **genereClasse** : une vidéo ou une série d'images s'affiche. Vous sélectionnez une classe puis vous cliquez pour mettre des ROI (Region Of Interest) centrées sur vos zones d'intérêt.
 * **genereImagettes** : produit effectivement les imagettes à partir des fichiers produits par l'application précédente.
@@ -19,9 +19,9 @@ Exemple sous Ubuntu :
 sudo apt-get install python3-pyqt5
 sudo pip install imutils opencv-contrib-python
 ```
-###genereClasse
+### genereClasse
 
-####Nouveau projet
+#### Nouveau projet
 Lors de l'utilisation pour un nouveau projet, il faut utiliser l'option -n pour spécifier le nombre de classes que l'on souhaite.
 ```
 python genereClasse -n 2
@@ -44,14 +44,14 @@ Si vous appuyez sur le bouton 'Paramètres', vous pourez modifier la source des 
 Pour quitter l'application, fermez la fenêtre de la façon classique (croix en haut à droite) ce qui aura pour effet de vous demander unrépertoire de sauvegarde pour ce projet où seront sauvés les deux fichier, param et images, qui contiennent tout votre travail.
 
 ![alt text](https://github.com/raiv-toulouse/generationClasseImage/blob/master/safra.png "Logo Title Text 1")
-####Projet existant
+#### Projet existant
 Si votre projet existe déjà et que vous souhaitez juste le compléter (lui ajouter de nouveaux ROI), il faudra utiliser l'option -r et pour cela faites : 
 ```
 python genereClass -r <le répertoire de votre projet>
 ``` 
 L'interface s'ouvre sur la dernière image traitée. Vous n'avez plus qu'à ajouter des ROI puis quitter pour sauvegarder toutes ces données.
 
-###genereImagettes
+### genereImagettes
 
 Cette application, sans IHM, prend en entrée le répertoire contenant les 2 fichiers générés par l'application genereClasses et construit les imagettes correspondant aux ROI spécifiés et les range dans des répertoires, un par classe.*
 
