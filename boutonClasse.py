@@ -15,6 +15,7 @@ class BoutonClasse(QPushButton):
         QPushButton.__init__(self, laClasse.nom)
         self.laClasse = laClasse
         self.setStyleSheet("background-color: %s " % laClasse.couleur)
+        self.setMinimumHeight(100)
         self.timer = QTimer()
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.clicked.emit)

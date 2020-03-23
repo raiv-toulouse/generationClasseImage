@@ -51,6 +51,19 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QPushButton" name="btnUndo">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Undo</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
     </layout>
