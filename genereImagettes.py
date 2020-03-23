@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pickle,argparse,os,cv2
 from utilitaires import Classe,ROI,Image,Param
 from sourceImagesFichier import SourceImagesFichier

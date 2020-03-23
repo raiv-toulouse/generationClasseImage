@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from imutils import paths
 import cv2
 

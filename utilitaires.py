@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class Classe:
     def __init__(self,numero,nom):
         self.couleur = '#ff0000'
