@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 from PyQt5.uic import loadUi
 from boutonClasse import BoutonClasse
 from sourceImagesFichier import SourceImagesFichier
@@ -11,6 +12,8 @@ import pickle
 
 
 class IHMGenereClasses(QDialog):
+    signalUndo = pyqtSignal()
+
     def __init__(self, args):
         super(QDialog, self).__init__()
         loadUi('ihm_genereClasses.ui', self)
@@ -19,6 +22,7 @@ class IHMGenereClasses(QDialog):
         self.btnParam.clicked.connect(self.changerParam)
         self.lblImage.nouveauPoint.connect(self.ajoutPoint)
         self.imageSlider.valueChanged.connect(self.selectImage)
+        self.btnUndo.clicked.connect(self.undo)
         # Les attributs
         self.lesClasses = []
         self.lesLabelsCompteurs = []
@@ -29,6 +33,17 @@ class IHMGenereClasses(QDialog):
         else:  # Pas encore de projet => première fois
             self.initPremiereFois(args)
         self.verticalLayout.addSpacerItem(QSpacerItem(150, 10, QSizePolicy.Expanding))
+
+    def undo(self):
+        imgCourante = self.lesImages[-1]
+        if imgCourante.lesROI:
+            imgCourante.lesROI.pop()
+            self.signalUndo.emit()  # Pour demander à effacer le dessin du ROI dans WidgetImage
+            # Màj du compteur de cette classe
+            numClasse = self.laClasseCourante.numero
+            nbEltDansClasse = int(self.lesLabelsCompteurs[numClasse].text())
+            nbEltDansClasse -= 1
+            self.lesLabelsCompteurs[numClasse].setText(str(nbEltDansClasse))
 
     def selectImage(self):
         if hasattr(self,'sourceImages'):  # Pour éviter une erreur lors de l'initialisation
@@ -118,7 +133,7 @@ class IHMGenereClasses(QDialog):
 
     # un nouveau point a été ajouté sur l'image
     def ajoutPoint(self,x,y):
-        imgCourante = self.lesImages[len(self.lesImages)-1]
+        imgCourante = self.lesImages[-1]
         imgCourante.lesROI.append(ROI(x,y,self.laClasseCourante))
         # Màj du compteur de cette classe
         numClasse = self.laClasseCourante.numero

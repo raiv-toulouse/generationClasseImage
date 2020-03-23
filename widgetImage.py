@@ -9,7 +9,9 @@ class WidgetImage(QLabel):
 
     def __init__(self,parent=None):
         super(WidgetImage, self).__init__()
+        self.parent = parent
         self.setCursor(Qt.CrossCursor)
+        self.parent.signalUndo.connect(self.effacer)
 
     def changeROI(self,larg,haut):
         self.largROI = larg
@@ -18,12 +20,21 @@ class WidgetImage(QLabel):
     def changeClasse(self,classe):
         self.classe = classe
 
+    def effacer(self):
+        self.dessinerROI(self.x,self.y,Qt.black)
+
     def mousePressEvent(self, QMouseEvent):
+        self.x = QMouseEvent.pos().x()
+        self.y = QMouseEvent.pos().y()
+        self.dessinerROI(self.x,self.y)
+
+    def dessinerROI(self,x,y,color=None):
         painter = QPainter(self.pixmap)
-        pen = QPen(QColor(self.classe.couleur), 1)
+        if color:
+            pen = QPen(color, 1)
+        else:
+            pen = QPen(QColor(self.classe.couleur), 1)
         painter.setPen(pen)
-        x = QMouseEvent.pos().x()
-        y = QMouseEvent.pos().y()
         self.nouveauPoint.emit(x,y)
         painter.drawRect(x-int(self.largROI/2),y-int(self.hautROI/2),self.largROI,self.hautROI)
         painter.end()
