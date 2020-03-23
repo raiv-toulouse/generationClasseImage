@@ -36,9 +36,4 @@ class WidgetImage(QLabel):
         bytesPerLine = 3 * width
         mQImage = QImage(img.data, width, height, bytesPerLine, QImage.Format_RGB888)
         self.pixmap = QPixmap.fromImage(mQImage)
-        painter = QPainter(self.pixmap)
-        pen = QPen(Qt.red, 3)
-        painter.setPen(pen)
-        #painter.drawRect(self.roi)
-        painter.end()
         self.setPixmap(self.pixmap)
