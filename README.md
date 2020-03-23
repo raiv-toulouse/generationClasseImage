@@ -60,5 +60,12 @@ Un paramètre est obligatoire : le répertoire contenant les 2 fichiers. C'est d
 ```
 python genereImagettes <nom_du_repertore>
 ```
+Si l'on souhaite changer la taille des imagettes, autre que celle qui avait été spécifiéee dans l'application genereClasses, vous devez utiliser les paramètres -lROI pour spécifier la largeur du nouveau ROI et -hROI pour spécifier sa nouvelle hauteur.
+
+Remarque : on peut n'en utiliser qu'un seul, auquel cas l'autre prendra la valeur spécifiée dans le fichier param.
+
+```
+python genereImagettes <le répertoire de votre projet> -lROI <nouvelle largeur> -hROI <nouvelle hauteur>
+```
 
 

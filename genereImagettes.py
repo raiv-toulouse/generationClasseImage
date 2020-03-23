@@ -6,6 +6,8 @@ from sourceImagesVideo import SourceImagesVideo
 
 parser = argparse.ArgumentParser()
 parser.add_argument("repProjet", help="répertoire du projet")
+parser.add_argument("-lROI", type=int,  help="largeur du ROI")
+parser.add_argument("-hROI", type=int,  help="hauteur du ROI")
 args = parser.parse_args()
 repertoireProjet = args.repProjet
 # Lecture du fichier des images
@@ -17,6 +19,12 @@ fichParam = open(repertoireProjet+"/param","rb")
 param = pickle.load(fichParam)
 lesClasses = pickle.load(fichParam)
 fichParam.close()
+# On prend en compte les éventuelles valeurs de largeur et hauteur pouur les ROI
+if args.lROI:
+    param.largeurROI = args.lROI
+if args.hROI:
+    param.hauteurROI = args.hROI
+print(param.largeurROI)
 # On va travailler dans le répertoire passé en paramètre
 os.chdir(repertoireProjet)
 # Création des répertoires pour les classes
@@ -36,9 +44,8 @@ indImg = 0
 for img in lesImages:
     _,image = sourceImages.imageCourante(img.posImg)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    print(type(gray))
-    cv2.imshow('image', gray)
-    cv2.waitKey(0)
+    # cv2.imshow('image', gray)
+    # cv2.waitKey(0)
     # Génération des imagettes (une par ROI)
     for roi in img.lesROI:
         x = roi.x
