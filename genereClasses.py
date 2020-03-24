@@ -70,9 +70,10 @@ class IHMGenereClasses(QMainWindow):
         if hasattr(self,'sourceImages'):  # Pour éviter une erreur lors de l'initialisation
             indImg = self.imageSlider.value()
             idImg, img = self.sourceImages.imageCourante(indImg)
-            self.lesImages.append(Image(idImg, indImg))
-            self.lblImage.afficherImage(img)
-            self.lblIndFrame.setText(str(self.imageSlider.value()))
+            if img is not None:
+                self.lesImages.append(Image(idImg, indImg))
+                self.lblImage.afficherImage(img)
+                self.lblIndFrame.setText(str(self.imageSlider.value()))
 
     def selectSource(self):
         '''
@@ -83,8 +84,8 @@ class IHMGenereClasses(QMainWindow):
             self.sourceImages = SourceImagesVideo(self.param.fichierOuRepertoire)
         else:
             self.sourceImages = SourceImagesFichier(self.param.fichierOuRepertoire)
-        self.imageSlider.maximum = self.sourceImages.nbFrames
-        self.lblNbFrames.setText(str(self.imageSlider.maximum))
+        self.imageSlider.setMaximum(self.sourceImages.nbFrames)
+        self.lblNbFrames.setText(str(self.imageSlider.maximum()))
 
     def changerParam(self):
         '''
