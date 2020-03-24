@@ -3,15 +3,20 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import  *
 
 
-# creation de la class, on precise qu'on derive la class QPushButton entre parentheses
 class BoutonClasse(QPushButton):
-    # creation du signal emetteur (emet rien pour le moment)
+    '''
+    Un bouton, associé à un label, qui permet de changer la classe cournate, càd celle qui sera associée à tous les futurs ROi créés
+    '''
+    # Les signaux
     rightClick = pyqtSignal()
     doubleClicked = pyqtSignal()
     clicked = pyqtSignal()
 
-    # creation de notre fonction __init__ avec un arg string pour le nom du futur bouton
     def __init__(self, laClasse):
+        """
+        Constructeur mémorisant la classe et utilisant ses caractéristiques pour initialiser la couleur et le texte du bouton
+        :param laClasse:
+        """
         QPushButton.__init__(self, laClasse.nom)
         self.laClasse = laClasse
         self.setStyleSheet("background-color: %s " % laClasse.couleur)
@@ -21,11 +26,13 @@ class BoutonClasse(QPushButton):
         self.timer.timeout.connect(self.clicked.emit)
         super().clicked.connect(self.checkDoubleClick)
 
-    # modification de la fontion mousePressEvent
     def mousePressEvent(self, event):
-        # on integre la fonction QPushButton.mousePressEvent(self, event) a notre fonction PushRightButton.mousePressEvent(self, event)
+        '''
+        Edition de la couleur sur un clic droit
+        :param event:
+        :return:
+        '''
         QPushButton.mousePressEvent(self, event)
-        # condition du click droit
         if event.button() == Qt.RightButton:
             # Edition de la couleur sur un clic droit
             color = QColorDialog.getColor()
@@ -33,6 +40,10 @@ class BoutonClasse(QPushButton):
             self.laClasse.couleur = color.name()
 
     def checkDoubleClick(self):
+        '''
+        Edition du texte du bouton sur un double-clic (modifie aussi le nom associé à la classe)
+        :return:
+        '''
         if self.timer.isActive():
             text, ok = QInputDialog.getText(self, 'Changement de classe', 'Nom de la classe :')
             if ok:

@@ -4,6 +4,12 @@ from utilitaires import Classe,ROI,Image,Param
 from sourceImagesFichier import SourceImagesFichier
 from sourceImagesVideo import SourceImagesVideo
 
+#
+# Depuis le répertoire du projet contenant les fichiers produits par genereClasses ('param' et 'images'),
+# génère les imagettes correspondant aux ROI des différentes images.
+#
+# python genereImagettes <repertoire_du_projet> [-lROI <largeur_ROI> -hROI <hauteur_ROI>]
+#
 parser = argparse.ArgumentParser()
 parser.add_argument("repProjet", help="répertoire du projet")
 parser.add_argument("-lROI", type=int,  help="largeur du ROI")
@@ -44,7 +50,7 @@ indImg = 0
 for img in lesImages:
     _,image = sourceImages.imageCourante(img.posImg)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # cv2.imshow('image', gray)
+    # cv2.imshow('image', gray)  # Pour DEBUG
     # cv2.waitKey(0)
     # Génération des imagettes (une par ROI)
     for roi in img.lesROI:

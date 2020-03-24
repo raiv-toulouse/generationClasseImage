@@ -10,13 +10,23 @@ from dialogParam import DialogParam
 from utilitaires import Classe,ROI,Image,Param
 import pickle
 
-
+#
+# But : Création de ROI à partir d'images provenant d'une vidéo ou d'un répertoire.
+#       Produit en sortie 2 fichiers, param et images, qui seront pris comme entrée par le programme genereImagettes
+#
+# python genereClasse -n <nb_de_classes>  si première fois (donc pas encore de projet)
+# python genereClasse -r <répertoire_du_projet>  si déjà un projet contenant des images déjà traitées)
+#
 class IHMGenereClasses(QDialog):
-    signalUndo = pyqtSignal()
+    '''
+    IHM permettant la création de ROI pour chacune des classes ce qui permettra de créer ensuite les imagettes correspondantes
+    '''
+    signalUndo = pyqtSignal()  # Signal envoyé à WidgetImage lors de la suppression du dernier ROI créé
 
     def __init__(self, args):
         super(QDialog, self).__init__()
         loadUi('ihm_genereClasses.ui', self)
+        # Gestionnaires d'évenements
         self.btnSuivant.clicked.connect(self.imageSuivante)
         self.btnPrecedent.clicked.connect(self.imagePrecedente)
         self.btnParam.clicked.connect(self.changerParam)
@@ -27,14 +37,19 @@ class IHMGenereClasses(QDialog):
         self.lesClasses = []
         self.lesLabelsCompteurs = []
         self.lesImages = []
-        # Ajout des boutons de classe
+        # Ajout dynamique des boutons de classe
         if args["repProjet"]:  # Un projet existe
             self.initDepuisProjet(args)
         else:  # Pas encore de projet => première fois
             self.initPremiereFois(args)
         self.verticalLayout.addSpacerItem(QSpacerItem(150, 10, QSizePolicy.Expanding))
 
+
     def undo(self):
+        '''
+        Lors du clic sur le bouton Undo, permet de supprimer le dernier ROI créé
+        :return:
+        '''
         imgCourante = self.lesImages[-1]
         if imgCourante.lesROI:
             imgCourante.lesROI.pop()
@@ -46,6 +61,10 @@ class IHMGenereClasses(QDialog):
             self.lesLabelsCompteurs[numClasse].setText(str(nbEltDansClasse))
 
     def selectImage(self):
+        '''
+        Lors du déplacement du slider, affiche l'image correspondante
+        :return:
+        '''
         if hasattr(self,'sourceImages'):  # Pour éviter une erreur lors de l'initialisation
             indImg = self.imageSlider.value()
             idImg, img = self.sourceImages.imageCourante(indImg)
@@ -54,6 +73,10 @@ class IHMGenereClasses(QDialog):
             self.lblIndFrame.setText(str(self.imageSlider.value()))
 
     def selectSource(self):
+        '''
+        Choix de la source d'images (vidéo ou répertoire)
+        :return:
+        '''
         if self.param.video:  # On va lire depuis une vidéo
             self.sourceImages = SourceImagesVideo(self.param.fichierOuRepertoire)
         else:
@@ -62,6 +85,10 @@ class IHMGenereClasses(QDialog):
         self.lblNbFrames.setText(str(self.imageSlider.maximum))
 
     def changerParam(self):
+        '''
+        Lors de l'appui sur le bouton Paramètres, permet de changer les dimensions du ROI et la source des images
+        :return:
+        '''
         dialog = DialogParam(self.param)
         result = dialog.exec_()
         if result:
@@ -73,6 +100,11 @@ class IHMGenereClasses(QDialog):
             self.imageSuivante()
 
     def initPremiereFois(self,args):
+        '''
+        Initialisation des boutons de classe en cas de première fois (pas encore de projet).
+        :param args: Les paramètres de la ligne de commande. Permet de récupérer le nb de classes à créer
+        :return:
+        '''
         nbClass = int(args["nbClass"])
         # Construction dynamique des boutons de classe
         for i in range(nbClass):
@@ -90,6 +122,12 @@ class IHMGenereClasses(QDialog):
         self.changeClasseCourante(self.lesClasses[0])
 
     def initDepuisProjet(self,args):
+        '''
+        Initialisation des boutons de classe en cas de projet déjà existant (donc on a mémorisé dans le fichier 'param'
+        les caractéristiques des ROI et la source des images) et dans 'images' les images et leurs ROI.
+        :param args: Les paramètres de la ligne de commande. Permet de récupérer le répertoire contenant les fichiers 'param' et 'images'
+        :return:
+        '''
         self.repertoireProjet = args["repProjet"]
         # Lecture du fichier des images
         fichImages = open(self.repertoireProjet+"/images","rb")
@@ -113,7 +151,34 @@ class IHMGenereClasses(QDialog):
         self.lblImage.changeROI(self.param.largeurROI,self.param.hauteurROI)
         self.changeClasseCourante(self.lesClasses[0])
 
+    def make_calluser(self, classe):
+        """
+        Appelée lors d'un clic sur un bouton de changement de classe
+        :param classe: la nouvelle classe courante (celle qui servira pour les futurs ROI)
+        :return:
+        """
+        def calluser():
+            self.changeClasseCourante(classe)
+        return calluser
+
+    def changeClasseCourante(self, classe):
+        '''
+        Mémorise que classe devient la classe courante, celle qui sera associée à tous les futurs ROI créés
+        :param classe: la classe à mémoriser
+        :return:
+        '''
+        self.laClasseCourante = classe
+        self.lblImage.changeClasse(classe)
+        # Mise à jour de l'IHM pour indiquer la nouvelle classe courante
+        self.lblClasseCourante.setText(self.laClasseCourante.nom)
+        self.lblClasseCourante.setStyleSheet("background-color: %s " % self.laClasseCourante.couleur)
+
     def ajoutBoutonClasse(self,laClasse):
+        '''
+        Création dynamique des boutons permettant de sélectionner le type de classe pour les futurs ROI.
+        :param laClasse: la classe qui sera associée aux futurs ROI que l'on va créer
+        :return:
+        '''
         layoutHoriz = QHBoxLayout()
         button = BoutonClasse(laClasse)
         button.clicked.connect(self.make_calluser(laClasse))
@@ -133,6 +198,13 @@ class IHMGenereClasses(QDialog):
 
     # un nouveau point a été ajouté sur l'image
     def ajoutPoint(self,x,y):
+        '''
+        Appelé lors de la réception du signal 'nouveauPoint' venant de WidgetImage quand un nouveau point a été cliqué
+        et donc qu'il faut créer le ROI correspondant.
+        :param x: coord x (en pixel) du clic
+        :param y: coord y (en pixel) du clic
+        :return:
+        '''
         imgCourante = self.lesImages[-1]
         imgCourante.lesROI.append(ROI(x,y,self.laClasseCourante))
         # Màj du compteur de cette classe
@@ -141,14 +213,11 @@ class IHMGenereClasses(QDialog):
         nbEltDansClasse += 1
         self.lesLabelsCompteurs[numClasse].setText(str(nbEltDansClasse))
 
-    def changeClasseCourante(self, classe):
-        self.laClasseCourante = classe
-        self.lblImage.changeClasse(classe)
-        # Mise à jour de l'IHM pour indiquer la nouvelle classe courante
-        self.lblClasseCourante.setText(self.laClasseCourante.nom)
-        self.lblClasseCourante.setStyleSheet("background-color: %s " % self.laClasseCourante.couleur)
-
     def imageSuivante(self):
+        '''
+        Suite à l'appui sur le bouton >, récupère depuis la source et affiche l'image suivante
+        :return:
+        '''
         idImg, img = self.sourceImages.imageSuivante()
         if img is not None:
             self.imageSlider.setValue(self.imageSlider.value()+1)
@@ -157,6 +226,10 @@ class IHMGenereClasses(QDialog):
             self.lblIndFrame.setText(str(self.imageSlider.value()))
 
     def imagePrecedente(self):
+        '''
+        Suite à l'appui sur le bouton <, récupère depuis la source et affiche l'image précédente
+        :return:
+        '''
         idImg, img = self.sourceImages.imagePrecedente()
         if img is not None:
             self.imageSlider.setValue(self.imageSlider.value() - 1)
@@ -164,12 +237,12 @@ class IHMGenereClasses(QDialog):
             self.lblImage.afficherImage(img)
             self.lblIndFrame.setText(str(self.imageSlider.value()))
 
-    def make_calluser(self, classe):
-        def calluser():
-            self.changeClasseCourante(classe)
-        return calluser
-
     def closeEvent(self, event):
+        '''
+        lors de la fermeture de la fenêtre, propose la sauvegarde du travail dans 2 fichiers : 'param' et 'images'
+        :param event:
+        :return:
+        '''
         reply = QMessageBox.question(self, 'Message',"Quitter (Y/N) et sauver (Y)?", QMessageBox.Yes| QMessageBox.No| QMessageBox.Cancel)
         if reply == QMessageBox.Yes:  # On quitte en sauvant
             self.sauveDansFichier()
@@ -180,6 +253,10 @@ class IHMGenereClasses(QDialog):
             event.ignore()  # On ne quitte pas
 
     def sauveDansFichier(self):
+        '''
+        Sauve les données (iamges et ROI) dans le fichier 'images' et les paramètres (ROI et source) dans 'param'
+        :return:
+        '''
         # Demande du répertoire de sauvegarde du projet
         if self.repertoireProjet==None: # Pas encore défini
             self.repertoireProjet = str(QFileDialog.getExistingDirectory(self, "Selectionnez le répertoire de sauvegarde du projet"))
