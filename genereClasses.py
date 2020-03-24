@@ -17,15 +17,17 @@ import pickle
 # python genereClasse -n <nb_de_classes>  si première fois (donc pas encore de projet)
 # python genereClasse -r <répertoire_du_projet>  si déjà un projet contenant des images déjà traitées)
 #
-class IHMGenereClasses(QDialog):
+class IHMGenereClasses(QMainWindow):
     '''
     IHM permettant la création de ROI pour chacune des classes ce qui permettra de créer ensuite les imagettes correspondantes
     '''
     signalUndo = pyqtSignal()  # Signal envoyé à WidgetImage lors de la suppression du dernier ROI créé
 
-    def __init__(self, args):
-        super(QDialog, self).__init__()
+    def __init__(self, args,parent=None):
+        super(IHMGenereClasses, self).__init__()
         loadUi('ihm_genereClasses.ui', self)
+        self.setWindowFlag(Qt.WindowMinimizeButtonHint,True)
+        self.setWindowFlag(Qt.WindowMaximizeButtonHint,True)
         # Gestionnaires d'évenements
         self.btnSuivant.clicked.connect(self.imageSuivante)
         self.btnPrecedent.clicked.connect(self.imagePrecedente)

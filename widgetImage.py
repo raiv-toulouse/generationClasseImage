@@ -14,7 +14,7 @@ class WidgetImage(QLabel):
         super(WidgetImage, self).__init__()
         self.parent = parent
         self.setCursor(Qt.CrossCursor)
-        self.parent.signalUndo.connect(self.effacer)
+        self.parent.parent().signalUndo.connect(self.effacer)
 
     def changeROI(self,larg,haut):
         '''
