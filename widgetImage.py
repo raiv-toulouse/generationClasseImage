@@ -60,12 +60,12 @@ class WidgetImage(QLabel):
         :return:
         '''
         painter = QPainter(self.pixmap)
-        if color:
+        if color:  # On efface le ROI courant
             pen = QPen(color, 1)
-        else:
+        else:  # Création d'un nouveau point (ROI)
             pen = QPen(QColor(self.classe.couleur), 1)
+            self.nouveauPoint.emit(x,y)
         painter.setPen(pen)
-        self.nouveauPoint.emit(x,y)
         painter.drawRect(x-int(self.largROI/2),y-int(self.hautROI/2),self.largROI,self.hautROI)
         painter.end()
         self.setPixmap(self.pixmap)
