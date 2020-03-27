@@ -252,9 +252,13 @@ class IHMGenereClasses(QMainWindow):
             self.sauveDansFichier()
             event.accept()
         elif reply == QMessageBox.No:
-            event.accept()   # On quitte, mais sans sauver
+            confirm = QMessageBox.question(self, 'Confirmation', "Etes-vous sûr ?",QMessageBox.Yes | QMessageBox.No)
+            if confirm == QMessageBox.Yes:
+                event.accept()   # On quitte, mais sans sauver
+            else:
+                event.ignore()  # On ne quitte pas
         else:
-            event.ignore()  # On ne quitte pas
+            event.ignore()
 
     def sauveDansFichier(self):
         '''
