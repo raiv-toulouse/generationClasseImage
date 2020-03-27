@@ -34,12 +34,12 @@ class WidgetImage(QLabel):
         '''
         self.classe = classe
 
-    def effacer(self):
+    def effacer(self,x,y):
         '''
         'Efface' un ROI en cas de Undo (le dessine en noir)
         :return:
         '''
-        self.dessinerROI(self.x,self.y,Qt.black)
+        self.dessinerROI(x,y,Qt.black)
 
     def mousePressEvent(self, QMouseEvent):
         '''
@@ -47,9 +47,9 @@ class WidgetImage(QLabel):
         :param QMouseEvent:
         :return:
         '''
-        self.x = QMouseEvent.pos().x()
-        self.y = QMouseEvent.pos().y()
-        self.dessinerROI(self.x,self.y)
+        x = QMouseEvent.pos().x()
+        y = QMouseEvent.pos().y()
+        self.dessinerROI(x,y)
 
     def dessinerROI(self,x,y,color=None):
         '''

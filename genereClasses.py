@@ -21,7 +21,7 @@ class IHMGenereClasses(QMainWindow):
     '''
     IHM permettant la création de ROI pour chacune des classes ce qui permettra de créer ensuite les imagettes correspondantes
     '''
-    signalUndo = pyqtSignal()  # Signal envoyé à WidgetImage lors de la suppression du dernier ROI créé
+    signalUndo = pyqtSignal(int,int)  # Signal envoyé à WidgetImage lors de la suppression du dernier ROI créé
 
     def __init__(self, args,parent=None):
         super(IHMGenereClasses, self).__init__()
@@ -54,8 +54,9 @@ class IHMGenereClasses(QMainWindow):
         '''
         imgCourante = self.lesImages[-1]
         if imgCourante.lesROI:
+            roiAEffacer = imgCourante.lesROI[-1]  # Le dernier ROI
+            self.signalUndo.emit(roiAEffacer.x,roiAEffacer.y)  # Pour demander à effacer le dessin du ROI dans WidgetImage
             imgCourante.lesROI.pop()
-            self.signalUndo.emit()  # Pour demander à effacer le dessin du ROI dans WidgetImage
             # Màj du compteur de cette classe
             numClasse = self.laClasseCourante.numero
             nbEltDansClasse = int(self.lesLabelsCompteurs[numClasse].text())
