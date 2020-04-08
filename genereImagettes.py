@@ -16,6 +16,7 @@ parser.add_argument("-lROI", type=int,  help="largeur du ROI")
 parser.add_argument("-hROI", type=int,  help="hauteur du ROI")
 # Indique que le fichier doit être pris dans le répertoire courant, pas dans celuid'origine.
 parser.add_argument("-r", help="fichier dans répertoire", action="store_true")
+parser.add_argument("-e", help="egalisation d'histogramme", action="store_true")
 args = parser.parse_args()
 repertoireProjet = args.repProjet
 # Lecture du fichier des images
@@ -48,12 +49,14 @@ if param.video:  # On va lire depuis une vidéo
     sourceImages = SourceImagesVideo(param.fichierOuRepertoire)
 else:
     sourceImages = SourceImagesFichier(param.fichierOuRepertoire)
-# On traite maintenant image par image (depuis un répertoire d'iamges ou une vidéo)
+# On traite maintenant image par image (depuis un répertoire d'images ou une vidéo)
 indImg = 0
 for img in lesImages:
     _,image = sourceImages.imageCourante(img.posImg)
     (hautImage,largImage,_) = image.shape
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    if args.e:  # On veut faire une égalisation d'histogramme
+        gray = cv2.equalizeHist(gray)
     # cv2.imshow('image', gray)  # Pour DEBUG
     # cv2.waitKey(0)
     # Génération des imagettes (une par ROI)
