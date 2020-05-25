@@ -16,7 +16,7 @@ parser.add_argument("-lROI", type=int,  help="largeur du ROI")
 parser.add_argument("-hROI", type=int,  help="hauteur du ROI")
 # Indique que le fichier doit être pris dans le répertoire courant, pas dans celuid'origine.
 parser.add_argument("-r", help="fichier dans répertoire", action="store_true")
-parser.add_argument("-e", help="egalisation d'histogramme", action="store_true")
+parser.add_argument("-e", help="egalisation d'histogramme (CLAHE)", action="store_true")
 args = parser.parse_args()
 repertoireProjet = args.repProjet
 # Lecture du fichier des images
@@ -28,7 +28,7 @@ fichParam = open(repertoireProjet+"/param","rb")
 param = pickle.load(fichParam)
 # Si le paramètre in est défini, alors on va chercher les fichiers dans le répertoire courant
 if args.r:
-    param.fichierOuRepertoire = repertoireProjet+"/"+os.path.basename(param.fichierOuRepertoire)
+    param.fichierOuRepertoire = os.path.basename(param.fichierOuRepertoire)
 lesClasses = pickle.load(fichParam)
 fichParam.close()
 # On prend en compte les éventuelles valeurs de largeur et hauteur pouur les ROI
@@ -54,9 +54,17 @@ indImg = 0
 for img in lesImages:
     _,image = sourceImages.imageCourante(img.posImg)
     (hautImage,largImage,_) = image.shape
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
     if args.e:  # On veut faire une égalisation d'histogramme
-        gray = cv2.equalizeHist(gray)
+        #CLAHE (Contrast Limited Adaptive Histogram Equalization)
+        clahe = cv2.createCLAHE(clipLimit=3., tileGridSize=(8,8))
+        lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)  # convert from BGR to LAB color space
+        l, a, b = cv2.split(lab)  # split on 3 different channels
+        l2 = clahe.apply(l)  # apply CLAHE to the L-channel
+        lab = cv2.merge((l2,a,b))  # merge channels
+        image = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)  # convert from LAB to BGR
+        
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     # cv2.imshow('image', gray)  # Pour DEBUG
     # cv2.waitKey(0)
     # Génération des imagettes (une par ROI)
